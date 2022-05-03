@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  db: 
+    image: mongo:latest
+    container_name: db
+    restart: unless-stopped
+    volumes:
+      - ./db_data:/data/db
+    ports:
+      - "${DB_PORT}:${GUI_PORT}"
+    networks:
+      - backend
+
+  web:
+    image: mongo-express
+    container_name: db-gui
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      ME_CONFIG_MONGODB_SERVER: db
+      ME_CONFIG_BASICAUTH_USERNAME: ${DB_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${DB_PASS}
+    ports:
+      - "${GUI_PORT}:${GUI_PORT}"
+    networks:
+      - backend
+volumes:
+  db_data: {}
+networks:
+  backend:
